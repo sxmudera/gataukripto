@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Inbox</h2>
+<table class="table table-hover align-middle">
+  <thead>
+    <tr>
+      <th>From</th>
+      <th>Type</th>
+      <th>Received</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for msg in messages %}
+    <tr>
+      <td>{{ msg.sender }}</td>
+      <td>{{ msg.type }}</td>
+      <td>{{ msg.created_at }}</td>
+      <td>
+        <a class="btn btn-sm btn-primary" href="{{ url_for('view', msg_id=msg.id) }}">View</a>
+        <a class="btn btn-sm btn-danger" href="{{ url_for('delete', box='inbox', msg_id=msg.id) }}"
+           onclick="return confirm('Delete this message?')">🗑️</a>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4">No messages</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

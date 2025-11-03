@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Message from {{ sender }}</h2>
+
+{% if mtype == 'text' %}
+  <div class="mb-3">
+    <label class="form-label">Decrypted content</label>
+    <pre class="p-3 border bg-light">{{ content }}</pre>
+  </div>
+
+{% elif mtype == 'image' %}
+  <div class="mb-3">
+    <label class="form-label">Extracted secret</label>
+    <pre class="p-3 border bg-light">{{ content }}</pre>
+    <img src="{{ image_path }}" alt="stego image" class="img-fluid mt-2" />
+  </div>
+
+{% elif mtype == 'file' %}
+  <p><strong>File from {{ sender }}</strong></p>
+  <p>File name: {{ file_name }}</p>
+  <a href="{{ url_for('download_file', msg_id=msg_id) }}" class="btn btn-primary">Download File</a>
+
+{% else %}
+  <p>Unsupported message type.</p>
+{% endif %}
+
+<a href="{{ url_for('inbox') }}" class="btn btn-secondary">Back</a>
+{% endblock %}

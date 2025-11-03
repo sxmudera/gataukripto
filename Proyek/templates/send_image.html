@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Kirim Gambar - SecureMail{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h3 class="mb-3">Kirim Gambar (Steganografi)</h3>
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label">Penerima</label>
+          <input type="text" name="receiver" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Pilih Gambar</label>
+          <input type="file" name="image" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Pesan Rahasia</label>
+          <textarea name="message" rows="4" class="form-control" required></textarea>
+        </div>
+        <button class="btn btn-primary w-100">Sisipkan & Kirim</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

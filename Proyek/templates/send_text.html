@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Kirim Pesan - SecureMail{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h3 class="mb-3">Kirim Pesan Teks</h3>
+      <form method="POST">
+        <div class="mb-3">
+          <label class="form-label">Penerima</label>
+          <input type="text" name="receiver" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Isi Pesan</label>
+          <textarea name="message" rows="4" class="form-control" required></textarea>
+        </div>
+        <button class="btn btn-primary w-100">Kirim</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

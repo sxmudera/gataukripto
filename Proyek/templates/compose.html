@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Compose</h2>
+<form method="post" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Recipient</label>
+    <input class="form-control" name="recipient" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Message type</label>
+    <select class="form-select" name="mtype" id="mtype" onchange="onTypeChange()">
+      <option value="text">Text</option>
+      <option value="image">Image (with secret)</option>
+      <option value="file">File (encrypt)</option>
+    </select>
+  </div>
+
+  <!-- TEXT MESSAGE -->
+  <div id="text_area">
+    <div class="mb-3">
+      <label class="form-label">Text message</label>
+      <textarea class="form-control" name="message" rows="4"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">XOR key (optional)</label>
+      <input class="form-control" name="xor_key" value="key">
+    </div>
+  </div>
+
+  <!-- IMAGE MESSAGE -->
+  <div id="image_area" style="display:none;">
+    <div class="mb-3">
+      <label class="form-label">Upload image</label>
+      <input class="form-control" type="file" name="image" accept="image/*">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Secret to embed</label>
+      <input class="form-control" name="secret">
+    </div>
+  </div>
+
+  <!-- FILE MESSAGE -->
+  <div id="file_area" style="display:none;">
+    <div class="mb-3">
+      <label class="form-label">Upload file</label>
+      <input class="form-control" type="file" name="file">
+    </div>
+  </div>
+
+  <button class="btn btn-primary" type="submit">Send</button>
+</form>
+
+<script>
+function onTypeChange(){
+  var t = document.getElementById('mtype').value;
+  document.getElementById('text_area').style.display = (t==='text') ? 'block' : 'none';
+  document.getElementById('image_area').style.display = (t==='image') ? 'block' : 'none';
+  document.getElementById('file_area').style.display = (t==='file') ? 'block' : 'none';
+}
+</script>
+{% endblock %}
