@@ -5,13 +5,13 @@
 {% if mtype == 'text' %}
   <div class="mb-3">
     <label class="form-label">Decrypted content</label>
-    <pre class="p-3 border bg-light">{{ content }}</pre>
+    <pre class="p-3 border bg-light" style="white-space: pre-wrap; word-wrap: break-word;">{{ content }}</pre>
   </div>
 
 {% elif mtype == 'image' %}
   <div class="mb-3">
     <label class="form-label">Extracted secret</label>
-    <pre class="p-3 border bg-light">{{ content }}</pre>
+    <pre class="p-3 border bg-light" style="white-space: pre-wrap; word-wrap: break-word;">{{ content }}</pre>
     <img src="{{ image_path }}" alt="stego image" class="img-fluid mt-2" />
   </div>
 
