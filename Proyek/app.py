@@ -13,6 +13,7 @@ from crypto.super import super_encrypt, super_decrypt
 from crypto.file import encrypt_file, decrypt_file
 from crypto.stego import embed_text_in_image, extract_text_from_image
 from Crypto.Random import get_random_bytes
+import base64
 
 # Flask setup
 app = Flask(__name__)
@@ -162,44 +163,75 @@ def compose():
 
     return render_template('compose.html')
 
-@app.route('/view/<int:msg_id>')
+# ubah decorator agar menerima GET dan POST
+@app.route('/view/<int:msg_id>', methods=['GET', 'POST'])
 def view(msg_id):
     if 'user' not in session:
         return redirect(url_for('login'))
 
+    # ambil row pesan
     row = fetch_query("SELECT sender, type, payload FROM messages WHERE id=%s", (msg_id,), one=True)
     if not row:
         flash('Message not found.')
         return redirect(url_for('inbox'))
 
-    sender, mtype, payload = row['sender'], row['type'], row['payload']
+    sender = row['sender']
+    mtype = row['type']
+    payload = row['payload']
+
+    # TEXT: jangan decrypt otomatis. GET -> tampilkan form minta key.
 
     if mtype == 'text':
-        cipherbytes = aes_decrypt(payload)
-        xor_key = request.args.get('xor_key', 'key')
-        try:
-            text = super_decrypt(cipherbytes, xor_key)
-        except Exception as e:
-            text = f"[Error decrypting: {e}]"
-        return render_template('view_message.html', sender=sender, content=text, mtype='text')
+        b64_cipher = payload  # ini yang tersimpan di DB, AES + super_encrypt
+        decrypted = None
+        error = None
 
+        if request.method == 'POST':
+            xor_key = request.form.get('xor_key', '')
+            if xor_key:
+                try:
+                    cipherbytes = aes_decrypt(payload)
+                    decrypted = super_decrypt(cipherbytes, xor_key)
+                except Exception as e:
+                    error = f'[Decryption failed: {e}]'
+
+        return render_template(
+            'view_message.html',
+            sender=sender,
+            mtype='text',
+            content=decrypted,
+            error=error,
+            ciphertext=b64_cipher,  # baru ditambahkan
+            msg_id=msg_id
+        )
+
+
+    # IMAGE: langsung ekstrak seperti sebelumnya
     elif mtype == 'image':
-        obj = json.loads(aes_decrypt(payload).decode())
-        path = obj['stego_path']
         try:
-            secret = extract_text_from_image(path)
+            obj = json.loads(aes_decrypt(payload).decode())
+            stego_path = obj.get('stego_path')
+            secret = extract_text_from_image(stego_path)
         except Exception as e:
-            secret = f"[extract error: {e}]"
-        return render_template('view_message.html', sender=sender, mtype='image', image_path='/' + path, content=secret)
+            secret = f'[extract error: {e}]'
+            stego_path = obj.get('stego_path') if 'obj' in locals() else None
 
+        display_path = '/' + stego_path.replace('\\','/') if stego_path else None
+        return render_template('view_message.html', sender=sender, content=secret, mtype='image', image_path=display_path)
+
+    # FILE: tampilkan info file & tombol download (tidak otomatis mendownload)
     elif mtype == 'file':
-        # File tidak langsung dibuka, hanya info + tombol download
-        obj = json.loads(aes_decrypt(payload).decode())
-        file_name = obj['orig_name']
+        try:
+            obj = json.loads(aes_decrypt(payload).decode())
+            file_name = obj.get('orig_name')
+        except Exception as e:
+            file_name = None
         return render_template('view_message.html', sender=sender, mtype='file', file_name=file_name, msg_id=msg_id)
 
-    flash('Unsupported type')
-    return redirect(url_for('inbox'))
+    else:
+        flash('Unsupported message type')
+        return redirect(url_for('inbox'))
+
 
 @app.route('/download/<int:msg_id>')
 def download_file(msg_id):
