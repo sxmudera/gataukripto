@@ -1,6 +1,5 @@
 import os
 import json
-import tempfile
 from flask import Flask, render_template, request, redirect, session, flash, send_file, url_for
 from werkzeug.utils import secure_filename
 from config import (
@@ -14,8 +13,6 @@ from crypto.super import super_encrypt, super_decrypt
 from crypto.file import encrypt_file, decrypt_file
 from crypto.stego import embed_text_in_image, extract_text_from_image
 from Crypto.Random import get_random_bytes
-import mysql.connector
-from mysql.connector import Error
 
 # Flask setup
 app = Flask(__name__)
@@ -218,7 +215,13 @@ def download_file(msg_id):
     enc_path = obj['file_path']
     orig_name = obj['orig_name']
 
-    return send_file(enc_path, as_attachment=True, download_name=orig_name)
+    from tempfile import NamedTemporaryFile
+    tmp = NamedTemporaryFile(delete=False)
+    decrypt_file(enc_path, tmp.name, BLOWFISH_KEY)
+    tmp.close()
+
+    return send_file(tmp.name, as_attachment=True, download_name=orig_name)
+
 
 
 @app.route('/delete/<string:box>/<int:msg_id>')
