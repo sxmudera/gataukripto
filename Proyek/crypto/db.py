@@ -6,7 +6,6 @@ from config import MASTER_KEY
 import base64
 
 def get_db():
-    """Membuka koneksi ke database MySQL"""
     return mysql.connector.connect(
         host=DB_HOST,
         user=DB_USER,
@@ -15,7 +14,6 @@ def get_db():
     )
 
 def execute_query(query, params=None):
-    """Menjalankan INSERT/UPDATE/DELETE"""
     conn = get_db()
     cur = conn.cursor(dictionary=True)
     cur.execute(query, params or ())
@@ -24,7 +22,6 @@ def execute_query(query, params=None):
     conn.close()
 
 def fetch_query(query, params=None, one=False):
-    """Menjalankan SELECT"""
     conn = get_db()
     cur = conn.cursor(dictionary=True)
     cur.execute(query, params or ())
@@ -33,14 +30,13 @@ def fetch_query(query, params=None, one=False):
     conn.close()
     return result
 
-AES_KEY = MASTER_KEY  # must be 16/24/32 bytes; here assumed 32 bytes
+AES_KEY = MASTER_KEY
 
 def aes_encrypt(plaintext: bytes) -> str:
-    """AES-CCM: returns base64(nonce|tag|ciphertext)"""
-    nonce = get_random_bytes(11)  # CCM nonce: 7-13 bytes
+    nonce = get_random_bytes(11)
     cipher = AES.new(AES_KEY, AES.MODE_CCM, nonce=nonce)
     ct = cipher.encrypt(plaintext)
-    tag = cipher.digest()  # 16-byte default
+    tag = cipher.digest()
     payload = nonce + tag + ct
     return base64.b64encode(payload).decode('utf-8')
 
@@ -50,5 +46,5 @@ def aes_decrypt(b64payload: str) -> bytes:
     tag = payload[11:27]
     ct = payload[27:]
     cipher = AES.new(AES_KEY, AES.MODE_CCM, nonce=nonce)
-    cipher.update(b"")  # optional, can authenticate additional data
+    cipher.update(b"") 
     return cipher.decrypt_and_verify(ct, tag)
