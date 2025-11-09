@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Decrypt File</h2>
+<p>To download this file, you must enter the encryption key used by the sender.</p>
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Encryption Key</label>
+    <input class="form-control" type="password" name="file_key" required autofocus>
+  </div>
+  <button type="submit" class="btn btn-primary">Decrypt & Download</button>
+  <a href="{{ url_for('inbox') }}" class="btn btn-secondary ms-2">Cancel</a>
+</form>
+
+<p class="mt-2 text-muted small">If decryption fails, verify the key and try again.</p>
+{% endblock %}
