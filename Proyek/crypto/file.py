@@ -4,9 +4,9 @@ from Crypto.Util.Padding import pad, unpad
 def normalize_key(user_key: str) -> bytes:
     key_bytes = user_key.encode()
     if len(key_bytes) < 4:
-        key_bytes = (key_bytes * 4)[:4]  # minimal 4 bytes
+        key_bytes = (key_bytes * 4)[:4]
     elif len(key_bytes) > 56:
-        key_bytes = key_bytes[:56]       # maksimal 56 bytes
+        key_bytes = key_bytes[:56]
     return key_bytes
 
 def encrypt_file(input_file, output_file, key):
@@ -28,3 +28,4 @@ def decrypt_file(input_file, output_file, key):
     decrypted = unpad(cipher.decrypt(data), Blowfish.block_size)
     with open(output_file, 'wb') as f:
         f.write(decrypted)
+
