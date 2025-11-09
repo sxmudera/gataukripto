@@ -6,9 +6,9 @@ def atbash_bytes(data: bytes) -> bytes:
     """
     result = bytearray()
     for b in data:
-        if 65 <= b <= 90:       # A-Z
+        if 65 <= b <= 90:
             result.append(65 + (25 - (b - 65)))
-        elif 97 <= b <= 122:    # a-z
+        elif 97 <= b <= 122:
             result.append(97 + (25 - (b - 97)))
         else:
             result.append(b)
@@ -36,3 +36,4 @@ def super_decrypt(cipherbytes: bytes, xor_key: str = 'key') -> str:
     step1 = xor_bytes(cipherbytes, xor_key.encode('utf-8'))
     step2 = atbash_bytes(step1)
     return step2.decode('utf-8', errors='replace')
+
